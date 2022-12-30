@@ -62,8 +62,8 @@ void GroupDef::_create_valueindexmap() {
 	m_indexmap[(*iref)->get_id()] = i;
 }
 
-const Chunk & GroupDef::get_child(std::string name) const {
-    return *at(get_child_index(name));
+const Chunk *GroupDef::get_child(std::string name) const {
+    return at(get_child_index(name));
 }
 
 int GroupDef::get_child_index(std::string name) const {

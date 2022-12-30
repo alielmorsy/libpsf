@@ -187,11 +187,11 @@ StructScalar::operator double() const {
 };
 
 template<>
-PSFDoubleVector::PSFVectorT() { init = 0; }
+inline PSFDoubleVector::PSFVectorT() { init = 0; }
 template<>
-PSFInt32Vector::PSFVectorT() { init = 0; }
+inline PSFInt32Vector::PSFVectorT() { init = 0; }
 template<>
-PSFComplexDoubleVector::PSFVectorT() { init = PSFComplexDouble(0,0); }
+inline PSFComplexDoubleVector::PSFVectorT() { init = PSFComplexDouble(0,0); }
 
 
 std::ostream &operator<<(std::ostream &stream, const Struct &o) {

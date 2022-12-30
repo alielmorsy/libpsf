@@ -19,9 +19,9 @@ int DataTypeDef::deserialize(const char *buf) {
     m_id = GET_INT32(buf); buf+=4;
 
     buf += m_name.deserialize(buf);
-	
+
     int arraytype = GET_INT32(buf); buf+=4;
-    
+
     m_datatypeid = GET_INT32(buf);
     buf += 4;
 
@@ -48,7 +48,7 @@ void * DataTypeDef::new_dataobject() const {
     case TYPEID_STRUCT:
 	return m_structdef->new_dataobject();
     default:
-	throw UnknownType(m_datatypeid);    
+	throw UnknownType(m_datatypeid);
     }
 }
 
@@ -65,13 +65,13 @@ int DataTypeDef::deserialize_data(void *data, const char *buf) const {
 	return 8;
     case TYPEID_COMPLEXDOUBLE:
 	double re, im;
-	GET_DOUBLE(re, buf); GET_DOUBLE(im, buf + 8); 
+	GET_DOUBLE(re, buf); GET_DOUBLE(im, buf + 8);
 	*(PSFComplexDouble *)data = PSFComplexDouble(re, im);
 	return 16;
-    case TYPEID_STRUCT: 
+    case TYPEID_STRUCT:
 	return ((Struct *)data)->deserialize(buf);
     default:
-	throw UnknownType(m_datatypeid);    
+	throw UnknownType(m_datatypeid);
     }
 }
 
@@ -88,7 +88,7 @@ PSFScalar *DataTypeDef::new_scalar() const {
     case TYPEID_STRUCT:
 	return new StructScalar(Struct(m_structdef));
     default:
-      throw UnknownType(m_datatypeid);    
+      throw UnknownType(m_datatypeid);
     }
 }
 
@@ -105,7 +105,7 @@ PSFVector *DataTypeDef::new_vector() const {
     case TYPEID_STRUCT:
 	return new StructVector(Struct(m_structdef));
     default:
-	throw UnknownType(m_datatypeid);    
+	throw UnknownType(m_datatypeid);
     }
 }
 
@@ -113,15 +113,15 @@ PSFVector *DataTypeDef::new_vector() const {
 // DataTypeRef
 //
 
-const DataTypeDef& DataTypeRef::get_def() const { 	
-    return dynamic_cast<const DataTypeDef&>(m_psf->get_type_section().get_child(m_datatypeid)); 
-}	
+const DataTypeDef& DataTypeRef::get_def() const {
+    return dynamic_cast<const DataTypeDef&>(m_psf->get_type_section().get_child(m_datatypeid));
+}
 
-int DataTypeRef::deserialize(const char *buf) {	
+int DataTypeRef::deserialize(const char *buf) {
     const char *startbuf = buf;
 
     buf += Chunk::deserialize(buf);
-	
+
     m_id = GET_INT32(buf); buf+=4;
     buf += m_name.deserialize(buf);
 
@@ -142,8 +142,8 @@ PSFVector * DataTypeRef::new_vector() const {
     return def.new_vector();
 }
 
-const DataTypeDef& DataTypeRef::get_datatype() const { 
-    return dynamic_cast<const DataTypeDef&>(m_psf->get_type_section().get_child(m_datatypeid)); 
+const DataTypeDef& DataTypeRef::get_datatype() const {
+    return dynamic_cast<const DataTypeDef&>(m_psf->get_type_section().get_child(m_datatypeid));
 }
 
 int DataTypeRef::datasize() const {

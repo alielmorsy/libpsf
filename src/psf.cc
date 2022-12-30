@@ -46,13 +46,13 @@ int PSFDataSet::get_sweep_npoints() const {
     return (int) m_psf->get_header_properties().find("PSF sweep points");
 }
 
-const std::vector<std::string> PSFDataSet::get_sweep_param_names() const {
+std::vector<std::string> PSFDataSet::get_sweep_param_names() const {
     verify_open();
 
     return m_psf->get_param_names();
 }
 
-PSFVector *PSFDataSet::get_sweep_values() const {	
+PSFVector *PSFDataSet::get_sweep_values() const {
     verify_open();
 
     return m_psf->get_param_values();
@@ -63,12 +63,12 @@ PSFBase* PSFDataSet::get_signal(std::string name) const {
 
     if (is_swept()) {
 	PSFVector *vec = get_signal_vector(name);
-	
+
 	if(m_invertstruct && dynamic_cast<const StructVector *>(vec)) {
 	    VectorStruct *vs = new VectorStruct(*dynamic_cast<const StructVector *>(vec));
-	    
+
 	    delete vec;
-	    
+
 	    return vs;
 	} else
 	    return vec;
@@ -79,13 +79,13 @@ PSFBase* PSFDataSet::get_signal(std::string name) const {
     }
 }
 
-PSFVector *PSFDataSet::get_signal_vector(std::string name) const {	
+PSFVector *PSFDataSet::get_signal_vector(std::string name) const {
     verify_open();
 
     return m_psf->get_values(name);
 }
 
-const PSFScalar& PSFDataSet::get_signal_scalar(std::string name) const {	
+const PSFScalar& PSFDataSet::get_signal_scalar(std::string name) const {
     verify_open();
 
     return m_psf->get_value(name);

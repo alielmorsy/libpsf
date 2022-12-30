@@ -99,17 +99,17 @@ const Chunk & IndexedContainer::get_child(int id) const {
     return *idmap.find(id)->second;
 }
 
-const Chunk & IndexedContainer::get_child(std::string name) const {
-    NameIndexMap::const_iterator i = namemap.find(name);
+const Chunk* IndexedContainer::get_child(std::string name) const {
+    auto i = namemap.find(name);
 
     if(i == namemap.end())
 	throw NotFound();
     else
-	return *at(i->second);
+	return at(i->second);
 }
 
 int IndexedContainer::get_child_index(std::string name) const {
-    NameIndexMap::const_iterator i = namemap.find(name);
+    auto i = namemap.find(name);
 
     if(i == namemap.end())
 	return -1;

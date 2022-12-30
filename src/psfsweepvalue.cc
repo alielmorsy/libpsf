@@ -4,6 +4,8 @@
 
 #include <assert.h>
 
+#include <utility>
+
 ValueSectionSweep::ValueSectionSweep(PSFFile *psf) : m_psf(psf) {
     m_chunktype = ValueSectionSweep::type;
 
@@ -12,20 +14,20 @@ ValueSectionSweep::ValueSectionSweep(PSFFile *psf) : m_psf(psf) {
     m_valuebuf = endbuf = NULL;
 }
 
-void ValueSectionSweep::_create_valueoffsetmap(bool windowedsweep) {    
+void ValueSectionSweep::_create_valueoffsetmap(bool windowedsweep) {
   const DataTypeRef *ref = NULL;
   Container::const_iterator itrace;
   int valueoffset = 0;
   int child_datasize;
-  
+
   m_valuesize = 0;
   m_ntraces = 0;
-  
+
   if (windowedsweep) {
     int windowsize = m_psf->get_header_properties().find("PSF window size");
-	
+
     for(itrace = m_psf->get_trace_section().begin(); itrace != m_psf->get_trace_section().end(); itrace++) {
-      if(const GroupDef *groupdef = dynamic_cast<const GroupDef *>(*itrace)) 
+      if(const GroupDef *groupdef = dynamic_cast<const GroupDef *>(*itrace))
 	child_datasize = groupdef->fill_offsetmap(m_offsetmap, windowsize, valueoffset);
       else
 	throw IncorrectChunk((*itrace)->m_chunktype);
@@ -39,7 +41,7 @@ void ValueSectionSweep::_create_valueoffsetmap(bool windowedsweep) {
 
       if(NULL != ref) {
 	const DataTypeDef &datatypedef = ref->get_datatype();
-	
+
 	// In waveform families there is a data file that only contains sweep values.
 	// In this case there are no trace values in the value section, yet there
 	// is a trace in the trace section with the same datatypeid as in the sweep.
@@ -53,9 +55,9 @@ void ValueSectionSweep::_create_valueoffsetmap(bool windowedsweep) {
 	m_offsetmap[ref->get_id()] = valueoffset + 8;
       } else if(const GroupDef *groupdef = dynamic_cast<const GroupDef *>(*itrace))
 	child_datasize = groupdef->fill_offsetmap(m_offsetmap, 0, valueoffset + 8);
-      else 
+      else
 	throw IncorrectChunk((*itrace)->m_chunktype);
-      
+
       m_valuesize += 8 + child_datasize;
       valueoffset += 8 + child_datasize;
     }
@@ -66,9 +68,9 @@ SweepValue* ValueSectionSweep::get_values(Filter &filter) const {
     const char *buf = m_valuebuf;
 
     SweepValue *value = new_value();
-    
+
     int n = m_psf->get_header_properties().find("PSF sweep points");
-    
+
     int windowoffset = 0;
     value->deserialize(buf, &n, windowoffset, m_psf, filter);
 
@@ -78,12 +80,12 @@ SweepValue* ValueSectionSweep::get_values(Filter &filter) const {
 PSFVector* ValueSectionSweep::get_values(std::string name) const {
     // Create filter for retrieving the trace with correct name
     Filter filter;
-    filter.push_back(&m_psf->get_trace_section().get_trace_by_name(name));
-    
+    filter.push_back(m_psf->get_trace_section().get_trace_by_name(std::move(name)));
+
     SweepValue *v = get_values(filter);
-    
+
     PSFVector *result = v->at(0);
-    
+
     // Clear vector to avoid deallocation of result
     v->clear();
 
@@ -109,15 +111,15 @@ int ValueSectionSweep::deserialize(const char *buf, int abspos) {
     const char *startbuf = buf;
 
     buf += Chunk::deserialize(buf);
-	
+
     uint32_t endpos = GET_INT32(buf);
     buf += sizeof(uint32_t);
 
     if (windowedsweep) {
 	ZeroPad pad;
 	buf += pad.deserialize(buf);
-    }  
-        
+    }
+
     _create_valueoffsetmap(windowedsweep);
 
     m_valuebuf = buf;
@@ -131,14 +133,14 @@ int ValueSectionSweep::deserialize(const char *buf, int abspos) {
 int ValueSectionSweep::get_valueoffset(int id) const {
     return m_offsetmap.find(id)->second;
 }
-    
+
 const ValueSectionSweep::iterator ValueSectionSweep::begin(SweepValue *value, ChildList &filter) const {
     return iterator(value, m_valuebuf, m_psf, &filter);
-}    
+}
 
 const ValueSectionSweep::iterator ValueSectionSweep::end() const {
     return iterator(NULL, endbuf-4, NULL, NULL);
-}    
+}
 
 SweepValue * ValueSectionSweep::new_value() const {
     if(windowedsweep)
@@ -153,7 +155,7 @@ PSFVector * SweepValue::get_param_values(bool release) {
     if(release)
 	m_paramvalues = NULL;
 
-    return result;	
+    return result;
 }
 
 SweepValue::~SweepValue() {
@@ -164,7 +166,7 @@ SweepValue::~SweepValue() {
 	delete(*i);
 }
 
-int SweepValueWindowed::deserialize(const char *buf, int *totaln, int windowoffset, PSFFile *psf, 
+int SweepValueWindowed::deserialize(const char *buf, int *totaln, int windowoffset, PSFFile *psf,
 				    Filter &filter) {
     const char *startbuf = buf;
 

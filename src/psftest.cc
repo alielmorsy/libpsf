@@ -22,7 +22,7 @@ void noisesummary() {
     std::cout << "Total: " << sum << std::endl;
 }
 
-int main() {
+int main1() {
     std::string dcopfile("../examples/data/opBegin");
     std::string pssfdfile("../examples/data/pss0.fd.pss");
     std::string tranfile("../examples/data/timeSweep");
