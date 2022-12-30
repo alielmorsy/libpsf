@@ -1,4 +1,5 @@
 libpsf is a c++ library that reads Cadence PSF waveform files
+That fork allow using Cmake instead of autoconf. And also fix most of memory leak issue
 
 Install
 =======
@@ -33,7 +34,7 @@ Build and install
     To build without the python binding, just set `-DWITH_PYTHON=OFF`
 - Build
 
-    $ make
+    $ cmake --build .
 - To run tests, [cppunit](https://www.freedesktop.org/wiki/Software/cppunit) is required.
     
     $ ctest
@@ -42,5 +43,5 @@ Build and install
 
 - Install
 
-    $ make install
+    $ cmake --install .
  
